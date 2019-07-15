@@ -1,0 +1,14 @@
+Topics explored in each folder:
+
+1: Gradient descent, linear regression.
+2: Classification, logistic regression, regularization.
+3: Multi-class classification.
+4: Training neural networks (backpropagation).
+5: Linear regression: bias vs variance; Learning and validation curves.
+6: Support vector machines. SVM spam filter.
+7: a) Clustering (K-means algorithm). 
+   b) Principal Component Analysis (PCA).
+8: a) Anomaly Detection.
+   b) Movie recommendation engine.
+
+
