@@ -1,4 +1,3 @@
-# ML
-Machine Learning Code
+## Machine Learning Code
 
-This repository is for some of the (Matlab) code I am writing while learning ML.
+This repository is for some of the code I am writing for various ML and data analysis projects.
