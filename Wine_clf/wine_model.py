@@ -94,7 +94,7 @@ for estimator in estimators:
         model = GridSearchCV(pipe, hyperparams, cv=10)
         model.fit(X_train, y_train)
         print("\nEstimator: Random Forest Classifier. \n"
-              "Best parameters after grid search with cross-validation: \n"
+              "Best parameters after grid search with cross-validation (cv=10): \n"
               f"{model.best_params_}\nwith score {model.best_score_}")
         # If model.refit is true (default), the model automatically refits to all of X_train.
         print(f"Automatic refit to full X_train: {model.refit}")

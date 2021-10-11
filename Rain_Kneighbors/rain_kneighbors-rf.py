@@ -8,8 +8,6 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn import metrics
 
 # %%
-
-
 def get_score(X_train, y_train, X_test, y_test, Classifier, options={}):
     model = Classifier(**options)
     model.fit(X_train, y_train)
