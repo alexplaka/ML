@@ -12,7 +12,8 @@ def draw_cat_plot(df, id_var, cat_feats, *, output_filename=None):
     df_cat = pd.melt(df, id_vars=id_var, value_vars=cat_feats)
 
     # Draw the catplot
-    fig = sns.catplot(x="variable", hue="value", col=id_var, data=df_cat, kind="count")
+    fig = sns.catplot(x="variable", hue="value", col=id_var, data=df_cat, 
+                      kind="count")
     fig.set_xlabels('')
     fig.set_xticklabels(rotation=90)
     fig.savefig(output_filename) if output_filename is not None else True
@@ -27,8 +28,8 @@ def draw_corr_matrix(df):
     """
 
     corr = df.corr()  # Calculate the correlation matrix
-    cardio_corr = corr.loc["Cardio", :"Active"]  # Correlation for the target (cardio)
-    mi = mutual_info_classif(df.iloc[:, :-1], df["Cardio"])  # Calculate mutual information score
+    cardio_corr = corr.loc["Cardio", :"Active"]  # Correlation for the target
+    mi = mutual_info_classif(df.iloc[:, :-1], df["Cardio"])  # Calculate MI score
     scores = cardio_corr.to_frame()
     scores.rename(columns={"Cardio": "Corr"}, inplace=True)
     scores["MI"] = mi
@@ -42,7 +43,8 @@ def draw_corr_matrix(df):
     ax[0].set_title("Feature Correlation", fontdict={"fontsize": 14})
 
     # Plot the "Cardio" correlation and mutual informatuion scores on the sme graph.
-    sns.barplot(x="value", y=scores_melted.index, hue="variable", data=scores_melted, ax=ax[1])
+    sns.barplot(x="value", y=scores_melted.index, hue="variable", 
+                data=scores_melted, ax=ax[1])
     # sns.barplot(x=[np.array(cardio_corr), mi], y=cardio_corr.index, ax=ax[1],
     #             color=[0.30, 0.41, 0.29])  # to plot just the "Cardio" correlation scores
     ax[1].set_title("Target (Cardio) Correlation and Mutual Information",
