@@ -13,7 +13,7 @@ rng = np.random.RandomState(0)  # initialize random number generator
 def load():
     """ Import data and rename the columns """
 
-    df = pd.read_csv("cardio_data.csv", index_col="id")
+    df = pd.read_csv("../cardio_data.csv", index_col="id")
 
     # Improve column names for readability
     df.rename(str.capitalize, axis='columns', inplace=True)
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     # Draw plots to describe the data.
     fig_cat = data_visualizer.draw_cat_plot(data_clean, "Cardio", cat_feats,
-                                            output_filename='catplot.png')
+                                            output_filename='catfeats_plot.png')
     fig_corr, corr, target_scores = data_visualizer.draw_corr_matrix(data_clean)
 
     X = data_clean.copy()

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.svm import SVC
@@ -7,17 +8,37 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 
 
-def get_cv_score(X, y, Classifier, /, options={}, *, cv=10, scoring='accuracy'):
+def get_cv_score(X: pd.DataFrame, y: pd.Series, Classifier, *, options=None, cv: int =10, scoring: str ='accuracy'):
+    """
+    Get cross-validation score.
+
+    :parameter X: pandas dataframe with explanatory data.
+    :parameter y: pandas series with target data.
+    :parameter Classifier: name of classifier.
+    :parameter options: options to pass to Classifier (default=None).
+    :parameter cv: number of cross-validation folds (default=10).
+    :parameter scoring: metric to evaluate for assessing model fit (default='accuracy').
+    :return: Mean cross-validation score.
+    """
+
+    if options is None:
+        options = {}
+
     scores = cross_val_score(Classifier(**options), X, y, cv=cv, scoring=scoring)
 
     return scores.mean()
 
 
-def svc_model(X_train, X_test, y_train, y_test):
+def svc_model(X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series):
     """
     Support Vector Machine Classifier model: choose kernel.
     Then fit to data and predict.
-    Return model and classification report.
+
+    :parameter X_train: Training data.
+    :parameter y_train: Target that corresponds to training data.
+    :parameter X_test: Test data.
+    :parameter y_test: Target that corresponds to test data.
+    :return: Model object, model predictions for test dataset, and classification report (dict).
     """
 
     kernel = 'linear'  # can try 'rbf' --> getting similar results.
@@ -30,11 +51,16 @@ def svc_model(X_train, X_test, y_train, y_test):
     return model, y_pred, classification_report(y_test, y_pred, output_dict=True)
 
 
-def kNN_model(X_train, X_test, y_train, y_test):
+def kNN_model(X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series):
     """
     K-nearest neighbors model: find best hyperparameter k and weight method.
     Then fit to (unscaled) data and predict.
-    Return model and classification report.
+
+    :parameter X_train: Training data.
+    :parameter y_train: Target that corresponds to training data.
+    :parameter X_test: Test data.
+    :parameter y_test: Target that corresponds to test data.
+    :return: Model object, model predictions for test dataset, and classification report (dict).
     """
 
     scores_u = []  # uniform weights
@@ -43,7 +69,7 @@ def kNN_model(X_train, X_test, y_train, y_test):
     for k in k_range:
         for weight in ['uniform', 'distance']:
             score = get_cv_score(X_train, y_train, KNeighborsClassifier,
-                                 {'n_neighbors': k, 'weights': weight})
+                                 options={'n_neighbors': k, 'weights': weight})
             scores_u.append(score) if weight == 'uniform' else scores_d.append(score)
 
     fig, ax = plt.subplots(figsize=(6, 5), dpi=100)
@@ -75,11 +101,16 @@ def kNN_model(X_train, X_test, y_train, y_test):
     return model, y_pred, classification_report(y_test, y_pred, output_dict=True)
 
 
-def RF_model(X_train, X_test, y_train, y_test):
+def RF_model(X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series):
     """
     Random Forest model model: find best hyperparameters.
     Then fit to data and predict.
-    Return model and classification report.
+
+    :parameter X_train: Training data.
+    :parameter y_train: Target that corresponds to training data.
+    :parameter X_test: Test data.
+    :parameter y_test: Target that corresponds to test data.
+    :return: Model object, model predictions for test dataset, and classification report (dict).
     """
 
     clf = RandomForestClassifier(random_state=0)
@@ -102,12 +133,21 @@ def RF_model(X_train, X_test, y_train, y_test):
     return model, y_pred, classification_report(y_test, y_pred, output_dict=True)
 
 
-def group_model(X_test, X_test_scaled, y_test, models, *, weights=None):
+def group_model(X_test: pd.DataFrame, X_test_scaled: pd.DataFrame, y_test: pd.Series, models: list, *, weights=None):
     """
-    ** Creating a group/ensemble model of all of the fitted models **
-    The below manipulations are equivalent to using sklearn.ensemble.VotingClassifier()
-    on the unfitted models with 'soft' voting.
-    Since we have already fit the models, calculating the average class probabilities manually.
+    Creating a group/ensemble model of all of the fitted models.
+
+    Note: The below manipulations are equivalent to using sklearn.ensemble.VotingClassifier()
+    on the unfitted models with 'soft' voting. Since we have already fit the models,
+    calculating the average class probabilities manually.
+
+    :parameter X_test: Unscaled test data.
+    :parameter X_test_scaled: Scaled test data.
+    :parameter y_test: Target that corresponds to test data.
+    :parameter models: List of pre-fitted model objects.
+    :parameter weights: Relative importance of the models in evaluating the class probabilities of the group model.
+                        (default=None; i.e., all models are equally important.)
+    :return: Group model predictions for test dataset and classification report (dict).
     """
 
     n = len(models)
@@ -115,7 +155,7 @@ def group_model(X_test, X_test_scaled, y_test, models, *, weights=None):
 
     p_weighted_vals = np.empty((X_test.shape[0], 2, n))  # initialize matrix
 
-    # Get probablility values for both classes for each estimator and weigh them.
+    # Get probability values for both classes for each estimator and weigh them.
     for i, model in enumerate(models):
         print(model)
         p_weighted_vals[:, :, i] = wgts[i] * model.predict_proba(X_test if str(model).startswith('K')

@@ -3,8 +3,13 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 
-def add_features(df):
-    """ Add 'BMI' (float) and 'Overweight' (0/1) columns """
+def add_features(df: pd.DataFrame):
+    """
+    Add 'BMI' (float) and 'Overweight' (0/1) columns.
+
+    :parameter df: pandas dataframe with all of the relevant features as columns.
+    :return: dataframe with the added features.
+    """
 
     # Calculate bmi (kg/m^2)
     df["BMI"] = df["Weight"] / (df["Height"] / 100) ** 2
@@ -22,13 +27,17 @@ def add_features(df):
     return df
 
 
-def cleanup(df):
+def cleanup(df: pd.DataFrame):
     """
     - Change "Age" from days to years.
     - Make "Gender" values start from 0.
     - Normalize data by making 0 always good and 1 always bad.
     - Remove wrong data or outliers.
+
+    :parameter df: pandas dataframe containing all of the data
+    :return: cleaned dataframe
     """
+
     df["Age"] = df["Age"] / 365
     df["Gender"] = df["Gender"] - 1
 
@@ -57,15 +66,21 @@ def cleanup(df):
     return df
 
 
-def scaler(X_train, X_test, *, cat_feats=[], num_feats=[]):
+def scaler(X_train: pd.DataFrame, X_test: pd.DataFrame, *, cat_feats=None, num_feats=None):
     """
     Choose between scaling the data using the StandardScaler or heterogeneous scaling of features.
     For heterogeneous scaling, the categorical and numerical features must be specified.
     Then, apply:
+
     - min_max scaling (from -1 to 1) for categoricals
       (to avoid non-symmetric scaling about zero due to category frequencies in dataset)
     - standard scaling for numerical features
     """
+
+    if num_feats is None:
+        num_feats = []
+    if cat_feats is None:
+        cat_feats = []
 
     X_train_scaled = pd.DataFrame()
     X_test_scaled = pd.DataFrame()
